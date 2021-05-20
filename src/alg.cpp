@@ -7,14 +7,13 @@ class TPQueue {
     T data;
     ITEM* next;
   };
-  
   public:
-  TPQueue() : head(nullptr), tail(nullptr) {}
+  TPQueue() : head(nullptr), tail(nullptr) {} 
   ~TPQueue();
   void push(const T&);
   T pop();
   private:
-  ITEM* create(const T& data) {
+  ITEM* create(const T&  data) {
     ITEM* item = new ITEM;
     item->data = data;
     item->next = nullptr;
