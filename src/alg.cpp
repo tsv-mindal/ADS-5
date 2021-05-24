@@ -1,71 +1,77 @@
 // Copyright 2021 NNTU-CS
 #ifndef INCLUDE_TPQUEUE_H_
 #define INCLUDE_TPQUEUE_H_
-template <typename T>
+#include <cassert>
+
+template<typename T>
 class TPQueue {
   struct ITEM {
     T data;
-    ITEM* next;
+    ITEM * next;
   };
-  public:
-  TPQueue() : head(nullptr), tail(nullptr) {} 
+ public:
+  TPQueue();
   ~TPQueue();
   void push(const T&);
   T pop();
-  private:
-  ITEM* create(const T&  data) {
-    ITEM* item = new ITEM;
-    item->data = data;
-    item->next = nullptr;
-    return item;
-  }
-  ITEM* head;
-  ITEM* tail;
+ private:
+  TPQueue :: ITEM * create(const T&);
+  ITEM * head;
+  ITEM * tail;
 };
-template < typename T >
-TPQueue <T>::~TPQueue() {
-  while (head)
-    pop();
+template<typename T>
+TPQueue<T>::TPQueue():
+    head(0), tail(0) {}
+template<typename T>
+typename TPQueue<T>::ITEM * TPQueue <T>::create(const T& data) {
+ITEM * item = new ITEM;
+item->data = data;
+item->next = nullptr;
+return item;
 }
-template < typename T >
-void TPQueue <T>::push(const T& data) {
-  if (head == nullptr) {
+template<typename T>
+     TPQueue<T>::~TPQueue() {
+        while (head)
+           pop();
+     }
+template<typename T>
+void TPQueue<T>::push(const T& data) {
+  if (tail && head) {
+      ITEM* temp = head;
+      if (data.prior > temp->data.prior) {
+        temp = create(data);
+        temp->next = head;
+        head = temp;
+      } else {
+        while ((data.prior <= temp->data.prior) && (temp->next))
+            temp = temp->next;
+      }
+      if (!temp->next) {
+        temp = create(data);
+        tail->next = temp;
+        tail = temp;
+      } else {
+        ITEM* tempI = temp;
+        temp = create(data);
+        temp->next = tempI;
+      }
+  } else {
     head = create(data);
     tail = head;
-  } else {
-    ITEM* temp = head;
-    while (temp->data.prior >= data.prior) {
-      temp = temp->next;
-      if (temp == nullptr)
-        break;
-    }
-    if (temp == nullptr) {
-      temp = create(data);
-      tail->next = temp;
-      tail = temp;
-    } else {
-      if (temp == head) {
-        head = create(data);
-        head->next = temp;
-      } else {
-        ITEM* temp1 = temp;
-        temp = create(data);
-        temp->next = temp1;
-      }
-    }
   }
 }
-
-template <typename T>
-T TPQueue <T>::pop() {
-  ITEM* temp = head -> next;
-  T data = head -> data;
-  delete head;
-  head = temp;
-  return data;
+template<typename T>
+T TPQueue<T>::pop() {
+  if (head) {
+    ITEM * temp = head->next;
+    T data = head->data;
+    delete head;
+    head = temp;
+    return data;
+  }
 }
 struct SYM {
   char ch;
-  int prior;
+  int  prior;
 };
 #endif // INCLUDE_TPQUEUE_H_
